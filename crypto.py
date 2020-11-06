@@ -6,7 +6,10 @@ import math
 def encrypt_caesar(plaintext, offset):
 	encryption = ""
 	for element in plaintext:
-		newunicode = ((ord(element) - 65 + offset) % 26) + 65
+		if not element.isalpha():
+			new_unicode = ord(element)
+		else:
+			newunicode = ((ord(element) - 65 + offset) % 26) + 65
 		encryption = encryption + chr(newunicode)
 	return encryption
 
@@ -16,12 +19,15 @@ def encrypt_caesar(plaintext, offset):
 def decrypt_caesar(ciphertext, offset):
 	encryption = ""
 	for element in ciphertext:
-		if ord(element) - offset < 0:
-			newunicode = ord(element) - offset + 26
-			encryption = encryption + chr(newunicode)
-		else:
-			newunicode = ord(element) - offset
-			encryption = encryption + chr(newunicode)
+		if not element.isalpha():
+			encryption = encryption + element
+		else
+			if ord(element) - offset < 0:
+				newunicode = ord(element) - offset + 26
+				encryption = encryption + chr(newunicode)
+			else:
+				newunicode = ord(element) - offset
+				encryption = encryption + chr(newunicode)
 	return encryption
 
 # Vigenere Cipher
@@ -122,7 +128,7 @@ def decrypt_mhkc(ciphertext, private_key):
 			counter = counter - 1
 		bits_tuple = tuple(bits)
 		array_of_bytes = array_of_bytes + (bits_to_byte(bits_tuple),)
-	return array_of_bytes 
+	return array_of_bytes_to_string(array_of_bytes)
 
 def find_S (Q, R):
 	S = 0
@@ -141,14 +147,14 @@ def byte_to_bits(value):
 			bits[counter] = 1
 		counter = counter - 1
 	bits_tuple = tuple(bits)
-	return bits_tuple
+	return bits_tuple[::-1]
 
 def bits_to_byte(bits):
 	byte = 0
 	counter = 0
 	holder = 0
 	while counter < 8:
-		holder = 2**counter
+		holder = 2**(7 - counter)
 		if bits [counter] == 1:
 			byte = byte + holder
 		counter = counter + 1
@@ -160,24 +166,27 @@ def array_of_bytes_to_string(array_of_bytes):
 		final_string = final_string + chr(x)
 	return final_string
 
-def main():
-    # Testing code here
-	caesar_E = encrypt_caesar("ABC", 4)
-	print (caesar_E)
-	
-	caesar_D = decrypt_caesar(caesar_E, 4)
-	print (caesar_D)
-	
-	vigenere_E = encrypt_vigenere("ZZZ", "ABC")
-	print (vigenere_E)
-	
-	vigenere_D = decrypt_vigenere(vigenere_E, "ABC")
-	print (vigenere_D)
-
-	private_key = generate_private_key()
-	public_key = create_public_key(private_key)
-	encryption = encrypt_mhkc("lil tester", public_key)
-	result = decrypt_mhkc(encryption, private_key)
-	print(array_of_bytes_to_string(result))	
-
-main()
+if __name__ == "__main__":
+    str = "A,ONEINPUT,O"
+    listo = str.split (",")
+    lis = []
+    for element in listo:
+        if element.isdigit():
+            lis.append(int(element))
+        else:
+            lis.append(element)
+    if lis[1].isdigit():
+        caesarEncryption = encrypt_caesar(lis[0], lis[1])
+        caesarDecryption = decrypt_caesar(caesarEncryption, lis[1])
+        if (caesarDecryption == lis[0]) & (caesarEncryption == lis[2]):
+            print("caesar true")
+    doubleone = encrypt_vigenere(lis[0], lis[1])
+    zero = decrypt_vigenere(doubleone, lis[1])
+    if (zero == lis[0]) & (doubleone == lis[2]):
+        print ("vigenere true")
+    privatekey = ((1, 2, 5, 13, 36, 93, 162, 397), 1043, 2)
+    publickey = (2, 4, 10, 26, 72, 186, 324, 794)
+    encryption = encrypt_mhkc("A", publickey)
+    print(encryption)
+    outcome = decrypt_mhkc([798], privatekey)
+    print (outcome)
